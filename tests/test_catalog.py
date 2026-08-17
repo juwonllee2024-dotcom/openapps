@@ -4,10 +4,19 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
-from openapps.catalog import App, InstallPlan, get_app, load_catalog, search_apps, validate_catalog
+from openapps.catalog import (
+    App,
+    InstallPlan,
+    get_app,
+    load_catalog,
+    search_apps,
+    search_replacements,
+    validate_catalog,
+)
 from openapps.cli import _app_rows, main
-from openapps.render import render_html, render_markdown
+from openapps.render import render_html, render_markdown, render_share
 
 
 class CatalogTests(unittest.TestCase):
@@ -31,6 +40,22 @@ class CatalogTests(unittest.TestCase):
         results = search_apps(apps, "REMOTE")
 
         self.assertIn("rustdesk", {app.slug for app in results})
+
+    def test_replacement_alias_exact_match_beats_generic_match(self):
+        apps = (
+            App(slug="generic", name="Generic", repo="o/generic", summary="notion notes"),
+            App(
+                slug="replacement",
+                name="Replacement",
+                repo="o/replacement",
+                summary="A notes app",
+                replaces=("Notion",),
+            ),
+        )
+
+        results = search_replacements(apps, "notion")
+
+        self.assertEqual(results[0].slug, "replacement")
 
     def test_validation_rejects_duplicate_slugs_and_missing_repository(self):
         apps = (
@@ -130,6 +155,40 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 2)
         self.assertIn("Unknown app: does-not-exist", output.getvalue())
+
+    def test_plan_command_prints_reviewable_data_without_running_it(self):
+        app = App(
+            slug="demo",
+            name="Demo",
+            repo="owner/demo",
+            summary="Demo app",
+            install_plans=(
+                InstallPlan(
+                    "docker",
+                    "Docker",
+                    "docker compose up -d",
+                    "Review storage first.",
+                ),
+            ),
+        )
+        output = io.StringIO()
+
+        with patch("openapps.cli.load_catalog", return_value=(app,)), redirect_stdout(output):
+            exit_code = main(["plan", "demo", "--platform", "docker"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("docker compose up -d", output.getvalue())
+        self.assertIn("Review", output.getvalue())
+
+    def test_share_command_prints_upstream_markdown(self):
+        output = io.StringIO()
+
+        with redirect_stdout(output):
+            exit_code = main(["share", "rustdesk"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("https://github.com/rustdesk/rustdesk", output.getvalue())
+        self.assertIn("OpenApps", output.getvalue())
 
     def test_doctor_reports_valid_catalog(self):
         output = io.StringIO()

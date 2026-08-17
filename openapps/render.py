@@ -37,6 +37,25 @@ def render_markdown(app: App) -> str:
     return "\n".join(lines)
 
 
+def render_share(app: App) -> str:
+    replacements = ", ".join(app.replaces) if app.replaces else "an existing tool"
+    setup = f"about {app.setup_minutes} minutes" if app.setup_minutes else "an upstream-guided setup"
+    return "\n".join(
+        [
+            f"## {app.name}: an open-source alternative",
+            "",
+            f"I found {app.name} through OpenApps as an alternative to {replacements}.",
+            f"- Privacy: {app.privacy_model}",
+            f"- Pricing: {app.pricing_model}",
+            f"- Setup: {setup}",
+            f"- Upstream: {app.github_url}",
+            "",
+            "OpenApps provides discovery and reviewable plans; it never executes installation commands.",
+            "",
+        ]
+    )
+
+
 def render_json(apps: Iterable[App]) -> str:
     return json.dumps([app.to_dict() for app in apps], indent=2, ensure_ascii=False) + "\n"
 

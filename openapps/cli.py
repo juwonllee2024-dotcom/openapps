@@ -5,8 +5,16 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-from .catalog import App, get_app, load_catalog, search_apps, validate_catalog
-from .render import render_html, render_json, render_markdown
+from .catalog import (
+    App,
+    get_app,
+    get_install_plan,
+    load_catalog,
+    search_apps,
+    search_replacements,
+    validate_catalog,
+)
+from .render import render_html, render_json, render_markdown, render_share
 
 
 def _add_json_flag(parser: argparse.ArgumentParser) -> None:
@@ -28,9 +36,26 @@ def build_parser() -> argparse.ArgumentParser:
     search_parser.add_argument("query")
     _add_json_flag(search_parser)
 
+    replace_parser = subparsers.add_parser(
+        "replace", help="find open-source alternatives to a paid app"
+    )
+    replace_parser.add_argument("query")
+    _add_json_flag(replace_parser)
+
     show_parser = subparsers.add_parser("show", help="show one catalog entry")
     show_parser.add_argument("slug")
     show_parser.add_argument("--json", action="store_true")
+
+    plan_parser = subparsers.add_parser("plan", help="show a reviewable setup plan")
+    plan_parser.add_argument("slug")
+    plan_parser.add_argument(
+        "--platform",
+        choices=("windows", "macos", "linux", "docker", "web", "all"),
+        default="all",
+    )
+
+    share_parser = subparsers.add_parser("share", help="print a shareable app brief")
+    share_parser.add_argument("slug")
 
     doctor_parser = subparsers.add_parser("doctor", help="validate bundled catalog")
     doctor_parser.add_argument("--json", action="store_true")
@@ -83,6 +108,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(_app_rows(results))
         return 0
 
+    if args.command == "replace":
+        results = search_replacements(apps, args.query)
+        if args.json:
+            print(render_json(results), end="")
+        else:
+            print(_app_rows(results))
+        return 0
+
     if args.command == "show":
         try:
             app = get_app(apps, args.slug)
@@ -93,6 +126,40 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(render_json((app,)), end="")
         else:
             print(render_markdown(app), end="")
+        return 0
+
+    if args.command == "plan":
+        try:
+            app = get_app(apps, args.slug)
+        except KeyError:
+            print(f"Unknown app: {args.slug}")
+            return 2
+        print(f"Setup plan: {app.name}")
+        print(f"Upstream: {app.github_url}")
+        if args.platform == "all":
+            plans = app.install_plans
+        else:
+            plan = get_install_plan(app, args.platform)
+            plans = (plan,) if plan is not None else ()
+        if not plans:
+            print("No verified local install command is bundled for this selection.")
+            print("Review the upstream installation guide before running anything.")
+            return 0
+        for plan in plans:
+            print(f"\n[{plan.label} · {plan.platform}]")
+            print(f"Command: {plan.command}")
+            if plan.notes:
+                print(f"Review: {plan.notes}")
+        print("\nOpenApps never executes installation commands.")
+        return 0
+
+    if args.command == "share":
+        try:
+            app = get_app(apps, args.slug)
+        except KeyError:
+            print(f"Unknown app: {args.slug}")
+            return 2
+        print(render_share(app), end="")
         return 0
 
     if args.command == "doctor":

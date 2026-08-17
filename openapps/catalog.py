@@ -165,6 +165,48 @@ def search_apps(apps: Iterable[App], query: str) -> tuple[App, ...]:
     )
 
 
+def _replacement_score(app: App, query: str) -> int:
+    normalized = query.casefold().strip()
+    aliases = tuple(alias.casefold() for alias in app.replaces)
+    if normalized in aliases:
+        return 1200
+    if normalized == app.slug.casefold() or normalized == app.name.casefold():
+        return 1000
+    if any(normalized in alias for alias in aliases):
+        return 900
+    if normalized in app.slug.casefold() or normalized in app.name.casefold():
+        return 800
+    if normalized in {tag.casefold() for tag in app.tags}:
+        return 700
+    if normalized in app.search_text():
+        return 300
+    return 0
+
+
+def search_replacements(apps: Iterable[App], query: str) -> tuple[App, ...]:
+    normalized = query.casefold().strip()
+    if not normalized:
+        return tuple(sorted(apps, key=lambda app: app.name.casefold()))
+    matches = ((app, _replacement_score(app, normalized)) for app in apps)
+    return tuple(
+        app
+        for app, score in sorted(
+            ((app, score) for app, score in matches if score),
+            key=lambda item: (-item[1], item[0].name.casefold()),
+        )
+    )
+
+
+def get_install_plan(app: App, platform: str) -> InstallPlan | None:
+    normalized = platform.casefold().strip()
+    if normalized == "all":
+        return None
+    return next(
+        (plan for plan in app.install_plans if plan.platform.casefold() == normalized),
+        None,
+    )
+
+
 def validate_catalog(apps: Iterable[App]) -> list[str]:
     errors: list[str] = []
     seen: set[str] = set()
