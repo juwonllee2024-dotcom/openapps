@@ -298,6 +298,18 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn("actions/upload-pages-artifact", workflow)
         self.assertIn("actions/deploy-pages", workflow)
 
+    def test_readme_documents_release_install_and_verifier(self):
+        project_root = Path(__file__).resolve().parents[1]
+        readme = (project_root / "README.md").read_text(encoding="utf-8")
+        verifier_path = project_root / "scripts" / "verify_release.ps1"
+        pyproject = (project_root / "pyproject.toml").read_text(encoding="utf-8")
+
+        self.assertIn("https://github.com/juwonllee2024-dotcom/openapps/releases/latest", readme)
+        self.assertIn("openapps_catalog-0.2.0-py3-none-any.whl", readme)
+        self.assertTrue(verifier_path.exists())
+        self.assertIn("[tool.setuptools.packages.find]", pyproject)
+        self.assertIn('include = ["openapps*"]', pyproject)
+
 
 if __name__ == "__main__":
     unittest.main()

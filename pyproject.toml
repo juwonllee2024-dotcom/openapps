@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openapps-catalog"
-version = "0.1.0"
+version = "0.2.0"
 description = "Discover and compare open-source software you can run yourself."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -25,3 +25,6 @@ openapps = "openapps.cli:main"
 
 [tool.setuptools.package-data]
 openapps = ["catalog.json"]
+
+[tool.setuptools.packages.find]
+include = ["openapps*"]
