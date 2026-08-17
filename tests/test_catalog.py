@@ -5,7 +5,7 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
-from openapps.catalog import App, get_app, load_catalog, search_apps, validate_catalog
+from openapps.catalog import App, InstallPlan, get_app, load_catalog, search_apps, validate_catalog
 from openapps.cli import _app_rows, main
 from openapps.render import render_html, render_markdown
 
@@ -42,6 +42,56 @@ class CatalogTests(unittest.TestCase):
 
         self.assertIn("duplicate slug: same", errors)
         self.assertIn("missing repo: same", errors)
+
+    def test_app_round_trips_replacement_and_install_plan_metadata(self):
+        app = App.from_mapping(
+            {
+                "slug": "demo",
+                "name": "Demo",
+                "repo": "owner/demo",
+                "summary": "Demo app",
+                "replaces": ["PaidApp"],
+                "platforms": ["docker"],
+                "pricing_model": "free-self-hosted",
+                "privacy_model": "self-hosted",
+                "setup_minutes": 12,
+                "install_plans": [
+                    {
+                        "platform": "docker",
+                        "label": "Docker",
+                        "command": "docker compose up -d",
+                        "notes": "Review storage first.",
+                    }
+                ],
+            }
+        )
+
+        payload = app.to_dict()
+
+        self.assertEqual(payload["replaces"], ["PaidApp"])
+        self.assertEqual(payload["install_plans"][0]["platform"], "docker")
+        self.assertEqual(app.setup_minutes, 12)
+
+    def test_validation_rejects_invalid_comparison_metadata(self):
+        app = App(
+            slug="bad",
+            name="Bad",
+            repo="owner/bad",
+            summary="Bad metadata",
+            platforms=("amiga",),
+            pricing_model="paid",
+            privacy_model="secret",
+            setup_minutes=-1,
+            install_plans=(InstallPlan("docker", "Docker", ""),),
+        )
+
+        errors = validate_catalog((app,))
+
+        self.assertIn("invalid platform: bad: amiga", errors)
+        self.assertIn("invalid pricing model: bad", errors)
+        self.assertIn("invalid privacy model: bad", errors)
+        self.assertIn("negative setup time: bad", errors)
+        self.assertIn("missing install command: bad: docker", errors)
 
     def test_renderers_keep_links_and_escape_html(self):
         app = App(
