@@ -1,75 +1,92 @@
-# OpenApps
+# 🚀 OpenApps
 
-> Discover open-source software you can run yourself.
+> **💸 Stop paying for software you can own.**
 
-OpenApps is a local-first catalog and launcher foundation for open-source apps.
-It helps you answer three questions quickly:
+🔍 Find an open-source alternative to the software you already use — then get a reviewable setup plan in seconds.
 
-1. What can I use instead of this SaaS product?
-2. Can I run it on my machine or server?
-3. What should I read before I install it?
+🧭 OpenApps is a local-first open-source App Store for people who want to replace paid software without handing their data to another directory, account, or AI service.
 
-No account. No model. No cloud dependency for the catalog.
+    🚀 name the paid app  →  🔍 compare alternatives  →  🛡️ review the setup  →  📤 share the find
 
-## Quick start
+⭐ If OpenApps saves you time, star the repo and share an alternative you trust.
 
-```bash
-python -m pip install -e .
+## ⚡ Try it in under a minute
 
-openapps search "remote"
-openapps show rustdesk
-openapps list --category documents
-openapps render --format html --output openapps.html
-openapps doctor
-```
+    python -m pip install -e .
 
-Open `openapps.html` in any browser to browse the catalog locally.
+    # 🔍 What can replace the software I already use?
+    openapps replace notion
 
-## What works today
+    # 🛡️ What should I review before setup?
+    openapps plan appflowy --platform all
 
-- Offline JSON catalog with 25 repositories from GitHub's monthly trending list.
-- Case-insensitive search across names, summaries, categories, and tags.
-- Human-readable Markdown, machine-readable JSON, and zero-dependency HTML output.
-- Catalog validation for duplicate slugs, malformed repository names, missing fields, and invalid counts.
-- Exportable app briefs for sharing or reviewing before deployment.
-- GitHub Action that keeps catalog quality checked on every change.
+    # 📤 Share a useful answer with a teammate
+    openapps share appflowy
 
-## Why this exists
+    # 🌐 Open the local visual storefront
+    openapps render --format html --output openapps.html
 
-Lists are good at discovery. They are bad at the moment after discovery: comparison,
-deployment fit, updates, backups, and safe migration.
+🌐 Open openapps.html in any browser. Search examples include Notion, Dropbox, TeamViewer, Google Analytics, Typeform, Plex, Retool, and Okta.
 
-OpenApps starts with a transparent, version-controlled catalog. The next layer is a
-verified deployment format that can generate a plan for Docker, native binaries,
-package managers, or a remote host. Installation will stay opt-in and reviewable.
+## 💡 Why OpenApps?
 
-## Roadmap
+Most software lists stop at “here is a link.” The expensive part comes next:
 
-- `openapps install`: verified, reviewable deployment plans.
+- 🖥️ Is this actually a fit for my device or server?
+- 🔒 Is my data local, self-hosted, or sent to a cloud?
+- ⏱️ How hard is the first setup?
+- 🛡️ What should I inspect before I run anything?
+
+✨ OpenApps turns that moment into a short, transparent decision. The catalog is plain JSON, the search works offline, and every upstream project stays linked to its original source.
+
+## ✅ What works today
+
+- 🔍 Intent search: openapps replace notion ranks replacement aliases before generic text matches.
+- 📊 Comparison metadata: replacements, platforms, pricing model, privacy model, and setup estimate.
+- 🛡️ Reviewable plans: commands are shown for inspection only; OpenApps never executes installation commands.
+- 📤 Shareable briefs: copy a concise Markdown explanation with an upstream link.
+- 🌐 Local storefront: responsive static HTML with search, filters, comparison cards, and copy-to-share behavior.
+- 🧰 27 curated projects, including eight high-intent SaaS replacement journeys.
+- 🔐 No account, model, cloud dependency, tracking pixel, or runtime dependency outside Python’s standard library.
+
+## 🛡️ Trust boundary
+
+OpenApps is a discovery and planning layer. It never executes installation commands, downloads software, elevates privileges, or silently changes your machine. A plan is a suggestion to review against the upstream project’s current documentation.
+
+⚠️ Always check the upstream license, release notes, security guidance, storage requirements, and backup plan before deployment.
+
+## 🧰 Commands
+
+| Command | Use |
+| --- | --- |
+| openapps replace QUERY | Find open-source alternatives to a paid product or use case |
+| openapps search QUERY | Search every catalog field |
+| openapps show SLUG | Read a Markdown app brief |
+| openapps plan SLUG | Print a non-executing setup plan |
+| openapps share SLUG | Print a shareable Markdown summary |
+| openapps render --format html --output openapps.html | Generate the local storefront |
+| openapps doctor | Validate catalog metadata |
+
+## 🌟 The difference
+
+OpenApps is not a paid placement marketplace and not a scraped software mirror. It is a reviewable map from a familiar product to an upstream open-source project, with enough context to make the next decision safely.
+
+## 🗺️ Roadmap
+
+- Verified platform-specific setup plans with upstream source references.
 - OS, CPU, memory, storage, license, and maintenance filters.
-- Backup and upgrade recipes with explicit rollback steps.
-- Import/export between local machines and self-hosted servers.
-- Community-maintained app manifests with CI validation.
-- Optional AI explanations through user-selected providers; never required.
+- Backup, upgrade, and rollback recipes.
+- Community-maintained manifests with CI validation.
+- A hosted, privacy-respecting storefront built from the same public catalog.
 
-## Design principles
+## 🤝 Contributing
 
-- Local-first: catalog search works without network access.
-- Upstream-first: link to original projects; do not mirror their code.
-- Safe by default: discovery and planning never execute installation commands.
-- Reproducible: catalog entries are plain JSON and changes are reviewable.
-- Provider-neutral: useful with no AI, local AI, or any cloud provider.
+Add a useful alternative, correct metadata, or improve the decision flow. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and [the catalog format](docs/catalog-format.md). Every trustworthy contribution makes the map better.
 
-## Contributing
+## 🔎 Research
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Add one catalog entry, run `openapps doctor`,
-and include the upstream source link.
+The initial catalog direction is documented in [the GitHub trends research note](docs/research/2026-08-github-trends.md).
 
-## Research
-
-The initial product direction is documented in
-[`docs/research/2026-08-github-trends.md`](docs/research/2026-08-github-trends.md).
-
-## License
+## 📄 License
 
 MIT. See [LICENSE](LICENSE).
