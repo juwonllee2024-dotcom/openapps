@@ -23,7 +23,7 @@ class CatalogTests(unittest.TestCase):
     def test_bundled_catalog_is_valid_and_contains_monthly_trending_repositories(self):
         apps = load_catalog()
 
-        self.assertEqual(len(apps), 25)
+        self.assertEqual(len(apps), 27)
         self.assertEqual(validate_catalog(apps), [])
         self.assertEqual(get_app(apps, "rustdesk").repo, "rustdesk/rustdesk")
 
@@ -56,6 +56,22 @@ class CatalogTests(unittest.TestCase):
         results = search_replacements(apps, "notion")
 
         self.assertEqual(results[0].slug, "replacement")
+
+    def test_high_intent_replacement_queries_have_results(self):
+        apps = load_catalog()
+
+        for query in (
+            "notion",
+            "dropbox",
+            "teamviewer",
+            "google analytics",
+            "typeform",
+            "plex",
+            "retool",
+            "okta",
+        ):
+            with self.subTest(query=query):
+                self.assertTrue(search_replacements(apps, query), query)
 
     def test_validation_rejects_duplicate_slugs_and_missing_repository(self):
         apps = (
@@ -197,7 +213,7 @@ class CliTests(unittest.TestCase):
             exit_code = main(["doctor"])
 
         self.assertEqual(exit_code, 0)
-        self.assertIn("Catalog valid: 25 apps", output.getvalue())
+        self.assertIn("Catalog valid: 27 apps", output.getvalue())
 
     def test_text_rows_are_encodable_on_windows_cp949(self):
         app = App(slug="demo", name="Demo", repo="owner/demo", summary="A tool")
