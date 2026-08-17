@@ -261,5 +261,20 @@ class CliTests(unittest.TestCase):
         self.assertNotIn("</script><script>alert(1)", html)
 
 
+class DocumentationTests(unittest.TestCase):
+    def test_readme_explains_the_product_and_safety_boundary(self):
+        readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Stop paying for software you can own.", readme)
+        self.assertIn(
+            "Find an open-source alternative to the software you already use — then get a reviewable setup plan in seconds.",
+            readme,
+        )
+        self.assertIn("openapps replace notion", readme)
+        self.assertIn("never executes installation commands", readme)
+
+
 if __name__ == "__main__":
     unittest.main()
