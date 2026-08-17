@@ -236,6 +236,30 @@ class CliTests(unittest.TestCase):
             self.assertIn("RustDesk", (export_path / "README.md").read_text(encoding="utf-8"))
             self.assertTrue((export_path / "app.json").exists())
 
+    def test_storefront_contains_product_promise_and_replacement_controls(self):
+        html = render_html(load_catalog())
+
+        self.assertIn("Stop paying for software you can own.", html)
+        self.assertIn("What do you want to replace?", html)
+        self.assertIn('placeholder="Notion, Dropbox, TeamViewer..."', html)
+        self.assertIn("copyShare", html)
+        self.assertIn("privacy_model", html)
+
+    def test_storefront_escapes_catalog_values_inside_cards_and_data(self):
+        app = App(
+            slug="demo",
+            name="<Demo>",
+            repo="owner/demo",
+            summary="A </script><script>alert(1)</script> tool",
+            replaces=("PaidApp",),
+        )
+
+        html = render_html((app,))
+
+        self.assertIn('id="catalog-data"', html)
+        self.assertIn("&lt;Demo&gt;", html)
+        self.assertNotIn("</script><script>alert(1)", html)
+
 
 if __name__ == "__main__":
     unittest.main()
