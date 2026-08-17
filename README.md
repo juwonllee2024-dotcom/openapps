@@ -90,3 +90,20 @@ The initial catalog direction is documented in [the GitHub trends research note]
 ## 📄 License
 
 MIT. See [LICENSE](LICENSE).
+
+## 🌐 Try the live demo
+
+**[Open the OpenApps storefront](https://juwonllee2024-dotcom.github.io/openapps/)** in your browser. It is the same static catalog you can generate locally, with no account and no runtime cloud dependency.
+
+![OpenApps real CLI smoke test](assets/openapps-demo.gif)
+
+This recording was generated from real `replace`, `plan`, `share`, and `render` commands in this repository. Read the exact output in [the smoke-test transcript](assets/openapps-demo-transcript.txt).
+
+## 📦 Install a release
+
+Download the latest tested wheel from [GitHub Releases](https://github.com/juwonllee2024-dotcom/openapps/releases/latest), then run:
+
+    python -m pip install openapps_catalog-0.2.0-py3-none-any.whl
+    openapps replace notion
+
+Each release is checked in a clean temporary virtual environment with [`scripts/verify_release.ps1`](scripts/verify_release.ps1) before it is published.
