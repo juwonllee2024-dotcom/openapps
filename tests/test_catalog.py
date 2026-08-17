@@ -263,7 +263,8 @@ class CliTests(unittest.TestCase):
 
 class DocumentationTests(unittest.TestCase):
     def test_readme_explains_the_product_and_safety_boundary(self):
-        readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(
+        project_root = Path(__file__).resolve().parents[1]
+        readme = (project_root / "README.md").read_text(
             encoding="utf-8"
         )
 
@@ -274,6 +275,28 @@ class DocumentationTests(unittest.TestCase):
         )
         self.assertIn("openapps replace notion", readme)
         self.assertIn("never executes installation commands", readme)
+
+    def test_readme_points_to_public_demo_and_recorded_smoke_test(self):
+        project_root = Path(__file__).resolve().parents[1]
+        readme = (project_root / "README.md").read_text(encoding="utf-8")
+        workflow_path = project_root / ".github" / "workflows" / "pages.yml"
+        workflow = workflow_path.read_text(encoding="utf-8") if workflow_path.exists() else ""
+        gif_path = project_root / "assets" / "openapps-demo.gif"
+        transcript_path = project_root / "assets" / "openapps-demo-transcript.txt"
+        transcript = transcript_path.read_text(encoding="utf-8") if transcript_path.exists() else ""
+
+        self.assertIn("https://juwonllee2024-dotcom.github.io/openapps/", readme)
+        self.assertIn("assets/openapps-demo.gif", readme)
+        self.assertTrue(gif_path.exists())
+        self.assertGreater(gif_path.stat().st_size, 10_000)
+        self.assertTrue(transcript_path.exists())
+        self.assertIn("$ python -m openapps replace notion", transcript)
+        self.assertIn("$ python -m openapps plan rustdesk --platform all", transcript)
+        self.assertIn("[exit code: 0]", transcript)
+        self.assertTrue(workflow_path.exists())
+        self.assertIn("actions/configure-pages", workflow)
+        self.assertIn("actions/upload-pages-artifact", workflow)
+        self.assertIn("actions/deploy-pages", workflow)
 
 
 if __name__ == "__main__":

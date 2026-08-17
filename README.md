@@ -90,3 +90,11 @@ The initial catalog direction is documented in [the GitHub trends research note]
 ## 📄 License
 
 MIT. See [LICENSE](LICENSE).
+
+## 🌐 Try the live demo
+
+**[Open the OpenApps storefront](https://juwonllee2024-dotcom.github.io/openapps/)** in your browser. It is the same static catalog you can generate locally, with no account and no runtime cloud dependency.
+
+![OpenApps real CLI smoke test](assets/openapps-demo.gif)
+
+This recording was generated from real `replace`, `plan`, `share`, and `render` commands in this repository. Read the exact output in [the smoke-test transcript](assets/openapps-demo-transcript.txt).
